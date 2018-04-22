@@ -12,7 +12,7 @@ let fakeServerData = {
     name: 'Jessop',
     playlists: [
     {
-      name: 'My favs',
+      name: 'Tool',
       songs: [
         {name: 'Undertow', duration: 1234},
         {name: 'Aenima', duration: 2345},
@@ -76,11 +76,13 @@ class HoursCounter extends Component {
 }
 
 class Filter extends Component {
+
   render() {
     return (
       <div style={{defaultStyle}}>
         <img/>
-        <input type="text"/>
+        <input type="text" onKeyUp={e =>
+          this.props.onTextChange(e.target.value)}/>
         Filter
       </div>
     )
@@ -96,7 +98,7 @@ class Playlist extends Component {
         <ul>
           {this.props.playlist.songs
             .map(song => <li>{song.name}</li>)}
-          
+
 
         </ul>
 
@@ -108,12 +110,18 @@ class Playlist extends Component {
 class App extends Component {
   constructor() {
     super()
-    this.state = {serverData: {}}
+    this.state = {
+      serverData: {},
+      filterString: ''
+    }
   }
   componentDidMount() {
     setTimeout(  () =>{
       this.setState({serverData: fakeServerData})
     }, 1000)
+    setTimeout(  () =>{
+      this.setState({filterString: ''})
+    }, 2000)
   }
   render() {
 
@@ -127,8 +135,12 @@ class App extends Component {
           </h1>
           <PlaylistCounter playlists={this.state.serverData.user.playlists}/>
           <HoursCounter playlists={this.state.serverData.user.playlists}/>
-          <Filter/>
+          <Filter onTextChange={text => this.setState({filterString: text})}/>
           {this.state.serverData.user.playlists
+            .filter( playlist => {
+              return playlist.name.toLowerCase().includes(this.state.filterString.toLowerCase())
+            })
+
             .map(playlist => <Playlist playlist={playlist}/>
           )}
 
